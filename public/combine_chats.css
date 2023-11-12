@@ -1,0 +1,24 @@
+#item-offset #items {
+    display: none;
+}
+
+#item-offset #cc_container {
+    height: 100%;
+    overflow-y: scroll;
+    line-height: 20px;
+}
+
+
+.cc_text_container {
+    padding: 3px 3px 4px 0px;
+}
+
+.cc_username {
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+
+.cc_message {
+    padding-left: 4px;
+    font-size: 1.4rem;
+}
