@@ -11,7 +11,8 @@
     "permissions": [
         "activeTab",
         "scripting",
-        "tabs"
+        "tabs",
+        "storage"
     ],
     "background": {
         "service_worker": "background.js",
@@ -24,6 +25,15 @@
         "*://*.youtube.com/live_chat*"
     ],
     "content_scripts": [
+        {
+            "js": [
+                "ytPageScript.js"
+            ],
+            "matches": [
+                "*://*.youtube.com/*"
+            ],
+            "run_at": "document_start"
+        },
         {
             "all_frames": true,
             "js": [

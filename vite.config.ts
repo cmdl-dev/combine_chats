@@ -35,7 +35,7 @@ export default defineConfig({
   ],
   build: {
     rollupOptions: {
-      input: ["index.html", "src/background.ts", "src/contentScript.ts"],
+      input: ["index.html", "src/background.ts", "src/contentScript.ts", "src/ytPageScript.ts"],
       output: {
         chunkFileNames: "[name].[hash].js",
         assetFileNames: "[name].[hash].[ext]",

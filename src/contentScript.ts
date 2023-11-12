@@ -89,10 +89,13 @@ function listenOnYTChat() {
 }
 document.addEventListener('DOMContentLoaded', function () {
     listenOnYTChat()
-    chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-        appendMessageToYT(message)
+    chrome.runtime.onMessage.addListener(function (message: { messageType: string, message: any }, sender, sendResponse) {
+        console.log(message, sender)
+        if (message.messageType === 'INCOMING_MESSAGE') appendMessageToYT(message.message)
+
     })
 })
+
 // TODO: automatically have the scroll bar scroll to the bottom
 function appendMessageToYT(message: IncomingMessage) {
     const userMessages = parseUserMessage(message.message)
