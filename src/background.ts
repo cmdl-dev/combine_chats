@@ -1,49 +1,75 @@
 //@ts-check
 import { Client, type ChatUserstate } from 'tmi.js';
 import { isCurrentlyStreaming, requestCurrentYoutubeUser } from './util/youtube';
-import { isYoutubeVideo, retry, sleep } from './util/helper';
+import { isYoutubeVideo, retry, sleep, stringToChatMessage } from './util/helper';
 import { getPairingForUser } from './util/storage';
 import type { Messenger } from './util/chromeTab';
-let tt_client: Client;
-let oauth = import.meta.env.VITE_OAUTH;
+const userClientMap: Map<string, ChatClient> = new Map();
+// TODO: have the user be able to login to twitch
+const oauth = import.meta.env.VITE_OAUTH;
+const userName = import.meta.env.VITE_USERNAME
 
+type ChatClient = {
+    client: Client,
+    tabId: number
+}
+type ChatTextType = {
+    type: 'string',
+    value: string,
+}
+
+type ChatLinkType = {
+    type: 'link',
+    value: string,
+}
+type ChatEmoteType = {
+    type: 'emote',
+    emoteTag: string,
+    value: string,
+}
+export type ChatMessage = ChatTextType | ChatLinkType | ChatEmoteType;
 export interface IncomingMessage extends ChatUserstate {
     origin: "YT" | "TT",
-    message: string,
+    message: ChatMessage[],
     channel: string
 }
 
-function createTwitchSocket(tab: chrome.tabs.Tab, tt_user: string) {
-    tt_client = new Client({
+function createTwitchSocket(tabId: number, tt_user: string) {
+    //MAYBE: have it so that the user only has 1 client open at a time, but connected to different channels
+    const ttClient = new Client({
         options: {},
         identity: {
-            username: "c_mdl",
+            username: userName,
             password: `oauth:${oauth}`
         },
         channels: [tt_user]
     })
 
-    tt_client.connect().catch(console.error)
-    tt_client.on('message', (channel, tags, message, self) => {
-        //console.log(channel, tags['display-name'], message, self)
+    ttClient.connect().catch(console.error)
+    ttClient.on('message', (channel, tags, message, self) => {
         const msg: Messenger = {
             messageType: 'INCOMING_MESSAGE',
             message: {
                 ...tags,
                 origin: 'TT',
-                message,
+                message: stringToChatMessage(message),
             } as IncomingMessage
         }
-        chrome.tabs.sendMessage(tab.id || 0, msg)
+        chrome.tabs.sendMessage(tabId, msg)
     })
+    const chatClient: ChatClient = {
+        client: ttClient,
+        tabId
+    }
+    userClientMap.set(tt_user, chatClient)
 }
 
 function connect(tab: chrome.tabs.Tab, tt_user: string) {
     try {
-        if (tt_client) return;
         if (!tab || !tab.id) return
-        console.log('tab ', tab.id)
-        createTwitchSocket(tab, tt_user)
+        console.log(userClientMap)
+        if (userClientMap.has(tt_user)) return;
+        createTwitchSocket(tab.id, tt_user)
     } catch (err) {
         console.log('backrgound task', err)
     }
@@ -72,7 +98,6 @@ async function insertIntoPage(tabId: number) {
         }
     })
 }
-//FIXME: I feel like this is not the way to do it to add stuff??
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
     if (changeInfo.status !== 'complete') return // only when the tab is created or reloaded
     if (!tab?.url) return

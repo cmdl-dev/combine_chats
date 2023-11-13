@@ -1,7 +1,6 @@
 import type { Messenger } from "./util/chromeTab"
 
 chrome.runtime.onMessage.addListener(function (message: Messenger, _, sendResponse) {
-    console.log('message', message)
     if (message.messageType === 'REQUEST_YT_USER') {
         sendResponse(requestYTInfo())
     }
@@ -11,12 +10,7 @@ chrome.runtime.onMessage.addListener(function (message: Messenger, _, sendRespon
     }
 })
 function requestIfStreaming(): boolean {
-    const yt_name = document.querySelector('#chatframe')
-    console.log(yt_name)
-    if (!yt_name) {
-        return false
-    }
-    return true
+    return Boolean(document.querySelector('#chatframe'))
 }
 function requestYTInfo(): string {
     const yt_name = document.querySelector('#channel-name #text > a')?.getAttribute('href')

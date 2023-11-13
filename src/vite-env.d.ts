@@ -2,7 +2,8 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-    readonly OAUTH: string
+    readonly VITE_OAUTH: string
+    readonly VITE_USERNAME: string
     // more env variables...
 }
 

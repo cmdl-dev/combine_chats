@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { resolve } from "path";
-import react from "@vitejs/plugin-react";
 import copy from "rollup-plugin-copy";
 import styleImport from "vite-plugin-style-import"
 
@@ -23,7 +22,6 @@ export default defineConfig({
         },
       ],
     }),
-    react(),
     copy({
       targets: [
         { src: "src/manifest.json", dest: "dist" },
