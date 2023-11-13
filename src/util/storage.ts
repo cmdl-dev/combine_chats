@@ -11,8 +11,8 @@ export async function updatePairing(yt_user: string, tt_user: string) {
 }
 
 
-function saveUrlPairing(yt_user: string, tt_user: string) {
-    chrome.storage.local.set({ urlPairing: { [yt_user]: tt_user } });
+async function saveUrlPairing(yt_user: string, tt_user: string) {
+    return chrome.storage.local.set({ urlPairing: { [yt_user]: tt_user } });
 }
 
 export async function getPairingForUser(yt_user: string) {

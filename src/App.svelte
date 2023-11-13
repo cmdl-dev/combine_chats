@@ -1,4 +1,5 @@
 <script lang="ts">
+  //TODO: Add toast message when success and failure
   import { onMount } from "svelte";
   import svelteLogo from "./assets/svelte.svg";
   import viteLogo from "/vite.svg";
@@ -13,20 +14,19 @@
 
   async function fillCurrentPage() {
     try {
+      debugger;
       const currentYTUser = await requestCurrentYoutubeUser();
       yt_user = currentYTUser;
-      const pagePairing = await getPairingForUser(yt_user);
+      const pagePairing = await getPairingForUser(currentYTUser);
       if (!pagePairing) return;
 
-      await updatePairing(yt_user, tt_user);
+      await updatePairing(currentYTUser, pagePairing);
+      // Update the state
       tt_user = pagePairing;
     } catch (err) {
       //TODO: Catch error
+      console.log(err);
     }
-  }
-  async function setYtInfo() {
-    let responese = await requestCurrentYoutubeUser();
-    if (responese) yt_user = responese;
   }
   onMount(() => {
     fillCurrentPage();
@@ -50,7 +50,7 @@
     <button on:click={handleButtonClick}>Submit</button>
   </div>
   <div class="card">
-    <button on:click={setYtInfo}>Current User</button>
+    <button on:click={fillCurrentPage}>Current User</button>
   </div>
 
   <p>

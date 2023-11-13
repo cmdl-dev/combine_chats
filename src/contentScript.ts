@@ -1,4 +1,5 @@
 import type { IncomingMessage } from "./background";
+import type { Messenger } from "./util/chromeTab";
 
 const ignoreList = ['Restream Bot', 'restreambot'].map(name => name.toLowerCase())
 /**
@@ -89,10 +90,8 @@ function listenOnYTChat() {
 }
 document.addEventListener('DOMContentLoaded', function () {
     listenOnYTChat()
-    chrome.runtime.onMessage.addListener(function (message: { messageType: string, message: any }, sender, sendResponse) {
-        console.log(message, sender)
-        if (message.messageType === 'INCOMING_MESSAGE') appendMessageToYT(message.message)
-
+    chrome.runtime.onMessage.addListener(function (message: Messenger, sender, sendResponse) {
+        if (message.message && message.messageType === 'INCOMING_MESSAGE') appendMessageToYT(message.message)
     })
 })
 
@@ -103,6 +102,7 @@ function appendMessageToYT(message: IncomingMessage) {
     const containerDiv = document.createElement('span')
     containerDiv.classList.add('cc_message')
 
+    // TODO: Refactor
     for (const uMessage of userMessages) {
         if (typeof uMessage === 'string') {
             const linkRegex = new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)/, 'gm')
@@ -111,7 +111,7 @@ function appendMessageToYT(message: IncomingMessage) {
                 for (const msg of messageComp) {
                     if (linkRegex.test(msg)) {
                         const link = document.createElement('a')
-                        link.href = uMessage
+                        link.href = msg
                         link.target = '_blank'
                         link.innerText = msg
                         containerDiv.append(link)
