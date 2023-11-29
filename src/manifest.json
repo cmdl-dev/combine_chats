@@ -3,7 +3,7 @@
     "description": "A browser extension made with Svelte Kit",
     "version": "1.0.0",
     "manifest_version": 3,
-    "minimum_chrome_version": "116",
+    "minimum_chrome_version": "1",
     "action": {
         "default_title": "Popup",
         "default_popup": "index.html"
